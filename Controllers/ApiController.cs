@@ -12,15 +12,11 @@ namespace lab5.Controllers
     [ApiController]
     public class LabController: ControllerBase
     {
-        List<GamesHistory> _gamesHistory;
-        List<LoginModel> _users;
-        public LabController()
-        {
-            _gamesHistory = new List<GamesHistory> { 
+        List<GamesHistory> _gamesHistory = new List<GamesHistory> {
                 new GamesHistory { WinnerEmail="winner1@gmail.com", LoserEmail = "loser1@gmail.com",GameStartTime = new DateTime(2022, 4, 1) ,GameFinishedTime = DateTime.Now  },
                 new GamesHistory { WinnerEmail="winner2@gmail.com", LoserEmail = "loser1@gmail.com",GameStartTime = new DateTime(2022, 4, 2) ,GameFinishedTime = DateTime.Now  }};
-            _users = new List<LoginModel>();
-        }
+        static List<LoginModel> _users = new List<LoginModel>();
+       
         /// <summary>
         /// Login user
         /// </summary>
@@ -34,7 +30,7 @@ namespace lab5.Controllers
         {
             var email_checker = new EmailAddressAttribute();
             
-            if (loginModel.Password.Length > 8 && email_checker.IsValid(loginModel.Email) && string.IsNullOrEmpty(loginModel.Name))
+            if (loginModel.Password.Length >= 8 && email_checker.IsValid(loginModel.Email) && !string.IsNullOrEmpty(loginModel.Name))
             {
                 _users.Add(loginModel);
                 return Ok(new ResponceMessage { Message = "You successfully login!", Status = true });
@@ -65,7 +61,7 @@ namespace lab5.Controllers
         /// <param ></param>
         /// <returns></returns>
         /// <response code="200">Returns success response</response>
-        // [ProducesResponseType(typeof(CommonResponse<UserClientSideData>), 200)]
+        [ProducesResponseType(typeof(ResponceMessage), 200)]
         [Route("update_user_info")]
         [HttpPut]
         public async Task<IActionResult> UpdateUserInfo(LoginModel loginModel)
@@ -76,7 +72,7 @@ namespace lab5.Controllers
                 {
                     _users.Remove(item);
                     _users.Add(loginModel);
-                    return Ok();
+                    return Ok(new ResponceMessage { Message = "Your info was successfully updated!", Status = true});
                 }
             }
 
@@ -88,7 +84,7 @@ namespace lab5.Controllers
         /// <param ></param>
         /// <returns></returns>
         /// <response code="200">Returns success response</response>
-        // [ProducesResponseType(typeof(CommonResponse<UserClientSideData>), 200)]
+         [ProducesResponseType(typeof(GameOponent), 200)]
         [Route("play")]
         [HttpPost]
         public async Task<IActionResult> Play()
